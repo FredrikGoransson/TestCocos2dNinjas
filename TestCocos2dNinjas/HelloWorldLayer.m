@@ -36,7 +36,13 @@
 
 - (void) addMonster {
     
-    CCSprite * monster = [CCSprite spriteWithFile:@"monster.png"];
+    //CCSprite * monster = [CCSprite spriteWithFile:@"monster.png"];
+    Monster * monster = nil;
+    if (arc4random() % 2 == 0) {
+        monster = [[[WeakAndFastMonster alloc] init] autorelease];
+    } else {
+        monster = [[[StrongAndSlowMonster alloc] init] autorelease];
+    }
     monster.tag = 1;
     [_monsters addObject:monster];
     
@@ -53,8 +59,8 @@
     [self addChild:monster];
     
     // Determine speed of the monster
-    int minDuration = 2.0;
-    int maxDuration = 4.0;
+    int minDuration = monster.minMoveDuration; //2.0;
+    int maxDuration = monster.maxMoveDuration; //4.0;
     int rangeDuration = maxDuration - minDuration;
     int actualDuration = (arc4random() % rangeDuration) + minDuration;
     
@@ -79,11 +85,17 @@
     NSMutableArray *projectilesToDelete = [[NSMutableArray alloc] init];
     for (CCSprite *projectile in _projectiles) {
         
+        BOOL monsterHit = FALSE;
         NSMutableArray *monstersToDelete = [[NSMutableArray alloc] init];
-        for (CCSprite *monster in _monsters) {
+        for (Monster *monster in _monsters) {
             
             if (CGRectIntersectsRect(projectile.boundingBox, monster.boundingBox)) {
-                [monstersToDelete addObject:monster];
+                monsterHit = TRUE;
+                monster.hp --;
+                if (monster.hp <= 0) {
+                    [monstersToDelete addObject:monster];
+                }
+                break;
             }
         }
         
@@ -92,14 +104,15 @@
             [self removeChild:monster cleanup:YES];
             _monstersDestroyed++;
 
-            if (_monstersDestroyed > 30) {
+            if (_monstersDestroyed > 5) {
                 CCScene *gameOverScene = [GameOverLayer sceneWithWon:YES];
                 [[CCDirector sharedDirector] replaceScene:gameOverScene];
             }
         }
         
-        if (monstersToDelete.count > 0) {
+        if (monsterHit) {
             [projectilesToDelete addObject:projectile];
+            [[SimpleAudioEngine sharedEngine] playEffect:@"explosion.caf"];
         }
         [monstersToDelete release];
     }
@@ -115,7 +128,7 @@
 // on "init" you need to initialize your instance
 - (id) init
 {
-    if ((self = [super initWithColor:ccc4(255,255,255,255)])) {
+    if ((self = [super initWithColor:[LevelManager sharedInstance].curLevel.backgroundColor])) {
         self.touchEnabled = YES;
         
         _monsters = [[NSMutableArray alloc] init];
@@ -125,7 +138,7 @@
         CCSprite *player = [CCSprite spriteWithFile:@"player.png"];
         player.position = ccp(player.contentSize.width/2, winSize.height/2);
         [self addChild:player];
-        [self schedule:@selector(gameLogic:) interval:1.0];
+        [self schedule:@selector(gameLogic:) interval:[LevelManager sharedInstance].curLevel.secsPerSpawn];
         [self schedule:@selector(update:)];
         
         [[SimpleAudioEngine sharedEngine] playBackgroundMusic:@"background-music-aac.caf"];

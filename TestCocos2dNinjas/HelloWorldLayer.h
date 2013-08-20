@@ -10,6 +10,8 @@
 #import <GameKit/GameKit.h>
 #import "SimpleAudioEngine.h"
 #import "GameOverLayer.h"
+#import "Monster.h"
+#import "LevelManager.h"
 
 // When you import this file, you import all the cocos2d classes
 #import "cocos2d.h"
