@@ -8,13 +8,16 @@
 
 
 #import <GameKit/GameKit.h>
+#import "SimpleAudioEngine.h"
 
 // When you import this file, you import all the cocos2d classes
 #import "cocos2d.h"
 
 // HelloWorldLayer
-@interface HelloWorldLayer : CCLayer <GKAchievementViewControllerDelegate, GKLeaderboardViewControllerDelegate>
+@interface HelloWorldLayer : CCLayerColor
 {
+    NSMutableArray * _monsters;
+    NSMutableArray * _projectiles;
 }
 
 // returns a CCScene that contains the HelloWorldLayer as the only child
