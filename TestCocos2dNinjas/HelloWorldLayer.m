@@ -64,6 +64,8 @@
     CCCallBlockN * actionMoveDone = [CCCallBlockN actionWithBlock:^(CCNode *node) {
         [node removeFromParentAndCleanup:YES];
         [_monsters removeObject:node];
+        CCScene *gameOverScene = [GameOverLayer sceneWithWon:NO];
+        [[CCDirector sharedDirector] replaceScene:gameOverScene];
     }];
     [monster runAction:[CCSequence actions:actionMove, actionMoveDone, nil]];
 }
@@ -88,6 +90,12 @@
         for (CCSprite *monster in monstersToDelete) {
             [_monsters removeObject:monster];
             [self removeChild:monster cleanup:YES];
+            _monstersDestroyed++;
+
+            if (_monstersDestroyed > 30) {
+                CCScene *gameOverScene = [GameOverLayer sceneWithWon:YES];
+                [[CCDirector sharedDirector] replaceScene:gameOverScene];
+            }
         }
         
         if (monstersToDelete.count > 0) {

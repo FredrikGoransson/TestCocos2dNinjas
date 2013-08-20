@@ -9,6 +9,7 @@
 
 #import <GameKit/GameKit.h>
 #import "SimpleAudioEngine.h"
+#import "GameOverLayer.h"
 
 // When you import this file, you import all the cocos2d classes
 #import "cocos2d.h"
@@ -18,6 +19,7 @@
 {
     NSMutableArray * _monsters;
     NSMutableArray * _projectiles;
+    int _monstersDestroyed;
 }
 
 // returns a CCScene that contains the HelloWorldLayer as the only child
